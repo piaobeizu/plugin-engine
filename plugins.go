@@ -32,10 +32,10 @@ type Plugin struct {
 	Config   any
 	queue    *event.Event
 	pool     *ants.Pool
-	plugin   *plugins.Plugin
+	plugin   plugins.Plugin
 }
 
-func NewPlugin(cfg config.Plugin, queue *event.Event, pool *ants.Pool, plugin *plugins.Plugin) *Plugin {
+func NewPlugin(cfg config.Plugin, queue *event.Event, pool *ants.Pool, plugin plugins.Plugin) *Plugin {
 	ctx, cancel := context.WithCancel(context.TODO())
 	return &Plugin{
 		ctx:      ctx,
@@ -52,24 +52,22 @@ func NewPlugin(cfg config.Plugin, queue *event.Event, pool *ants.Pool, plugin *p
 
 func (p *Plugin) Run() error {
 	// do something
-	plugin := p.create()
-	if plugin == nil {
+	if p.plugin == nil {
 		return fmt.Errorf("plugin[%s] not found", p.Name)
 	}
-	if err := plugin.Init(); err != nil {
+	if err := p.plugin.Init(); err != nil {
 		return err
 	}
-	p.pool.Submit(plugin.Run)
+	p.pool.Submit(p.plugin.Run)
 	return nil
 }
 
 func (p *Plugin) Stop() {
-	plugin := p.create()
-	if plugin == nil {
+	if p.plugin == nil {
 		logrus.Errorf("plugin[%s] not found", p.Name)
 	}
 	p.cancel()
-	plugin.Stop()
+	p.plugin.Stop()
 }
 
 func (p *Plugin) Status() error {
@@ -79,28 +77,11 @@ func (p *Plugin) Status() error {
 
 func (p *Plugin) Health() plugins.PluginState {
 	// do something
-	plugin := p.create()
-	if plugin == nil {
+	if p.plugin == nil {
 		logrus.Errorf("plugin[%s] not found", p.Name)
 		return ""
 	}
-	return plugin.Health()
-}
-
-func (p *Plugin) create() plugins.Plugin {
-	// do something
-	var plugin plugins.Plugin
-	switch {
-	// case p.Name == plugins.PluginNameGrpc:
-	// 	plugin = grpc.NewGrpcPlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
-	// case p.Name == plugins.PluginNameRouter:
-	// 	plugin = router.NewRouterPlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
-	// case p.Name == plugins.PluginNameMonitor:
-	// 	plugin = monitor.NewMonitorPlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
-	// case p.Name == plugins.PluginNameDowngrade:
-	// 	plugin = downgrade.NewDowngradePlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
-	}
-	return plugin
+	return p.plugin.Health()
 }
 
 func (p *Plugin) Restart() error {
@@ -110,12 +91,11 @@ func (p *Plugin) Restart() error {
 
 func (p *Plugin) RefreshCongfig(cfg any) {
 	// do something
-	plugin := p.create()
-	if plugin == nil {
+	if p.plugin == nil {
 		logrus.Errorf("plugin[%s] not found", p.Name)
 		panic(fmt.Errorf("plugin[%s] not found", p.Name))
 	}
-	plugin.RefreshConfig(cfg)
+	p.plugin.RefreshConfig(cfg)
 }
 
 type Plugins struct {
@@ -125,7 +105,7 @@ type Plugins struct {
 	queue    *event.Event
 	mu       sync.RWMutex
 	pool     *ants.Pool
-	pplugins map[plugins.PluginName]*plugins.Plugin
+	pplugins map[plugins.PluginName]plugins.Plugin
 }
 
 func NewPlugins(ctx context.Context, config []config.Plugin, q *event.Event, pool *ants.Pool) *Plugins {
@@ -136,12 +116,12 @@ func NewPlugins(ctx context.Context, config []config.Plugin, q *event.Event, poo
 		queue:    q,
 		mu:       sync.RWMutex{},
 		pool:     pool,
-		pplugins: map[plugins.PluginName]*plugins.Plugin{},
+		pplugins: map[plugins.PluginName]plugins.Plugin{},
 	}
 	return plugins
 }
 
-func (p *Plugins) AddPPlugin(name plugins.PluginName, plugin *plugins.Plugin) *Plugins {
+func (p *Plugins) AddPPlugin(name plugins.PluginName, plugin plugins.Plugin) *Plugins {
 	p.pplugins[name] = plugin
 	return p
 }

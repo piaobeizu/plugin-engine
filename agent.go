@@ -121,7 +121,7 @@ func (a *Agent) Start() error {
 	return nil
 }
 
-func (a *Agent) AddPlugin(name plugins.PluginName, plguin *plugins.Plugin) *Agent {
+func (a *Agent) AddPlugin(name plugins.PluginName, plguin plugins.Plugin) *Agent {
 	a.plugins.AddPPlugin(name, plguin)
 	return a
 }
