@@ -18,6 +18,7 @@ import (
 type Envs struct {
 	REDIS_KEY    string `env:"PE_REDIS_KEY" envDefault:"pe:agent:"`
 	LOCAL_CONFIG string `env:"PE_LOCAL_CONFIG" envDefault:"/etc/agent/config.json"`
+	DEBUG_MODE   string `env:"PE_DEBUG_MODE" envDefault:"debug"`
 }
 
 var (
