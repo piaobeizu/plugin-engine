@@ -32,10 +32,7 @@ import (
 type PluginName string
 
 var (
-	PluginNameGrpc      PluginName = "grpc"
-	PluginNameRouter    PluginName = "router"
-	PluginNameMonitor   PluginName = "monitor"
-	PluginNameDowngrade PluginName = "downgrade"
+	PluginNameDemo PluginName = "demo"
 )
 
 type PluginState string

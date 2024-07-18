@@ -69,6 +69,7 @@ func (p *DemoPlugin) Init() error {
 func (p *DemoPlugin) Run() {
 	p.Pool.Submit(p.ListenEvent)
 	p.State = plugins.PluginStateRunning
+
 }
 
 func (p *DemoPlugin) Stop() {

@@ -18,6 +18,7 @@ import (
 	"github.com/piaobeizu/plugin-engine/pkg/config"
 	"github.com/piaobeizu/plugin-engine/pkg/event"
 	"github.com/piaobeizu/plugin-engine/pkg/plugins"
+	"github.com/piaobeizu/plugin-engine/pkg/plugins/demo"
 
 	"github.com/panjf2000/ants/v2"
 	"github.com/sirupsen/logrus"
@@ -86,18 +87,12 @@ func (p *Plugin) Health() plugins.PluginState {
 }
 
 func (p *Plugin) create() plugins.Plugin {
-	// do something
+	//TODO: add your plugin here
 	var plugin plugins.Plugin
-	// switch {
-	// case p.Name == plugins.PluginNameGrpc:
-	// 	plugin = grpc.NewGrpcPlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
-	// case p.Name == plugins.PluginNameRouter:
-	// 	plugin = router.NewRouterPlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
-	// case p.Name == plugins.PluginNameMonitor:
-	// 	plugin = monitor.NewMonitorPlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
-	// case p.Name == plugins.PluginNameDowngrade:
-	// 	plugin = downgrade.NewDowngradePlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
-	// }
+	switch {
+	case p.Name == plugins.PluginNameDemo:
+		plugin = demo.NewDemoPlugin(p.ctx, p.Name, p.Version, p.Config, p.queue, p.pool)
+	}
 	return plugin
 }
 
