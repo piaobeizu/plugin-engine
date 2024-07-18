@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	"github.com/creasty/defaults"
+	"github.com/panjf2000/ants/v2"
 	"github.com/piaobeizu/plugin-engine/pkg/event"
 	"github.com/piaobeizu/plugin-engine/pkg/plugins"
 	"github.com/sirupsen/logrus"
