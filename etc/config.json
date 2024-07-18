@@ -1,0 +1,17 @@
+{
+    "queue": {
+        "msg_size": 1000
+    },
+    "plugins": [
+        {
+            "name": "demo",
+            "version": "0.0.1",
+            "enabled": true,
+            "location": "",
+            "config": {
+                "static": {},
+                "dynamic": {}
+            }
+        }
+    ]
+}

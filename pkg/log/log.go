@@ -17,7 +17,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/piaobeizu/plugin-engine/config"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -173,7 +172,7 @@ func getCaller(skip int) (string, int) {
 
 func InitLog() {
 	level := log.InfoLevel
-	if config.GetEnvs().DEBUG_MODE == "debug" {
+	if os.Getenv("D2_DEBUG_MODE") == "debug" {
 		level = log.DebugLevel
 	}
 	log.SetOutput(io.Discard)

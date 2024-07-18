@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/piaobeizu/plugin-engine/rds"
+	"github.com/piaobeizu/plugin-engine/pkg/rds"
 
 	"github.com/caarlos0/env"
 	"github.com/sirupsen/logrus"
@@ -16,15 +16,22 @@ import (
 // if reretrieval fails, we'll fallback to using the default configuration.
 
 type Envs struct {
-	REDIS_KEY    string `env:"PE_REDIS_KEY" envDefault:"pe:agent:"`
-	LOCAL_CONFIG string `env:"PE_LOCAL_CONFIG" envDefault:"/etc/agent/config.json"`
-	DEBUG_MODE   string `env:"PE_DEBUG_MODE" envDefault:"debug"`
+	RedisUrl          string `env:"REDIS_URL"`
+	TaskName          string `env:"TASK_NAME"`
+	ModelSeries       string `env:"MODEL_SERIES"`
+	IP                string `env:"POD_IP"`
+	ProxyURL          string `env:"PROXY_URL"`
+	ModelURL          string `env:"MODEL_URL" envDefault:"127.0.0.1"`
+	ModelPort         int64  `env:"MODEL_PORT" envDefault:"8001"`
+	ModelProcessCount int64  `env:"MODEL_PROCESS_COUNT" envDefault:"1"`
+	LBPolicy          string `env:"LOAD_BALANCER_POLICY" envDefault:"ONE"`
 }
 
 var (
-	REDIS_KEY_CONFIG = GetEnvs().REDIS_KEY + "config"
-	REDIS_KEY_MODELS = GetEnvs().REDIS_KEY + "models"
-	REDIS_KEY_ROUTES = GetEnvs().REDIS_KEY + "routes"
+	REDIS_KEY        = "d2:agent:"
+	REDIS_KEY_CONFIG = REDIS_KEY + "confi"
+	REDIS_KEY_MODELS = REDIS_KEY + "models"
+	REDIS_KEY_ROUTES = REDIS_KEY + "routes"
 )
 
 type PluginConfig struct {
@@ -34,7 +41,6 @@ type PluginConfig struct {
 
 type Plugin struct {
 	Name     string        `json:"name"`
-	Package  string        `json:"package"`
 	Version  string        `json:"version"`
 	Enabled  bool          `json:"enabled"`
 	Location string        `json:"location"`
@@ -44,17 +50,7 @@ type Event struct {
 	MsgSize int `json:"msg_size"`
 }
 
-type GoroutinePool struct {
-	Size             int `json:"size"`
-	ExpiryDuration   int `json:"expiry_duration"`
-	MaxBlockingTasks int `json:"max_blocking_tasks"`
-}
-type System struct {
-	GoroutinePool *GoroutinePool `json:"goroutine_pool"`
-}
-
 type Config struct {
-	System  *System  `json:"system"`
 	Event   *Event   `json:"event"`
 	Plugins []Plugin `json:"plugins"`
 }
@@ -66,7 +62,7 @@ func GetConfig() Config {
 	agent, err := rds.Get(REDIS_KEY_CONFIG)
 	if err != nil {
 		logrus.Warnf("Failed to get config from redis: %+v, try to read it from config file", err)
-		jsonFile, err := os.Open(GetEnvs().LOCAL_CONFIG)
+		jsonFile, err := os.Open("/etc/agent/config.json")
 		if err != nil {
 			panic(err)
 		}

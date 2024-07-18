@@ -6,7 +6,7 @@
  Desc     :
 */
 
-package engine
+package core
 
 import (
 	"context"
@@ -17,10 +17,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/piaobeizu/plugin-engine/config"
-	"github.com/piaobeizu/plugin-engine/event"
-	"github.com/piaobeizu/plugin-engine/plugins"
-	"github.com/piaobeizu/plugin-engine/utils"
+	"github.com/piaobeizu/plugin-engine/pkg/config"
+	"github.com/piaobeizu/plugin-engine/pkg/event"
+	"github.com/piaobeizu/plugin-engine/pkg/utils"
 
 	"github.com/panjf2000/ants/v2"
 	"github.com/sirupsen/logrus"
@@ -59,11 +58,11 @@ func NewAgent(ctx context.Context, cancel context.CancelFunc) *Agent {
 		stop:   make(chan struct{}, 1),
 	}
 	// step 3, we need to create a goroutine pool
-	pool, err := ants.NewPool(conf.System.GoroutinePool.Size, func(opts *ants.Options) {
+	pool, err := ants.NewPool(2000, func(opts *ants.Options) {
 		opts.ExpiryDuration = 60 * time.Second
 		opts.Nonblocking = false
 		opts.PreAlloc = true
-		opts.MaxBlockingTasks = conf.System.GoroutinePool.MaxBlockingTasks
+		opts.MaxBlockingTasks = 10
 		opts.PanicHandler = a.handlepanic
 	})
 	if err != nil {
@@ -119,11 +118,6 @@ func (a *Agent) Start() error {
 		}
 	})
 	return nil
-}
-
-func (a *Agent) AddPlugin(name plugins.PluginName, plguin plugins.Plugin) *Agent {
-	a.plugins.AddPPlugin(name, plguin)
-	return a
 }
 
 func (a *Agent) Wait() chan struct{} {

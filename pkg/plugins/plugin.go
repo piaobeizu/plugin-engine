@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/piaobeizu/plugin-engine/event"
+	"github.com/piaobeizu/plugin-engine/pkg/event"
 
 	"github.com/panjf2000/ants/v2"
 	"github.com/sirupsen/logrus"
@@ -30,6 +30,13 @@ import (
 //
 // )
 type PluginName string
+
+var (
+	PluginNameGrpc      PluginName = "grpc"
+	PluginNameRouter    PluginName = "router"
+	PluginNameMonitor   PluginName = "monitor"
+	PluginNameDowngrade PluginName = "downgrade"
+)
 
 type PluginState string
 

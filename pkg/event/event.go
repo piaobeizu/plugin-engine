@@ -14,7 +14,7 @@ import (
 	"math/rand"
 	"sync"
 
-	"github.com/piaobeizu/plugin-engine/config"
+	"github.com/piaobeizu/plugin-engine/pkg/config"
 
 	"github.com/panjf2000/ants/v2"
 	"github.com/sirupsen/logrus"
